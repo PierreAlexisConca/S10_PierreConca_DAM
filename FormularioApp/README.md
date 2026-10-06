@@ -1,74 +1,64 @@
 # S10_PierreConca_DAM
 
-**Desarrollo de Aplicaciones Móviles — S10 | AP5**  
+**Desarrollo de Aplicaciones Moviles - S10 | AP5**  
 Actividad Individual: Formularios y Validaciones  
 React Native + Expo
 
 ---
 
-## Descripción
+## Descripcion
 
-Formulario móvil interactivo de **Registro de Curso** (Opción 5) implementado con React Native y Expo Router. Aplica manejo de estados con `useState`, captura de datos con `TextInput`, validaciones en tiempo real y feedback visual al usuario.
+Formulario movil interactivo de **Registro de Curso** (Opcion 5) implementado con React Native y Expo Router.
+Aplica manejo de estados con `useState`, captura de datos con `TextInput`, validaciones en tiempo real y feedback visual.
 
-## Opción implementada
+## Opcion implementada
 
-**Opción 5 — Registro de Curso**
+**Opcion 5 - Registro de Curso**
 
-| Campo | Validación |
+| Campo | Validacion |
 |---|---|
-| Nombre del estudiante | Obligatorio, mínimo 3 caracteres |
-| Correo electrónico | Obligatorio, debe contener `@` |
-| Curso | Obligatorio, mínimo 3 caracteres |
-| Edad | Número entero entre 15 y 80 |
+| Nombre del estudiante | Obligatorio, minimo 3 caracteres |
+| Correo electronico | Obligatorio, debe contener `@` |
+| Curso | Obligatorio, minimo 3 caracteres |
+| Edad | Numero entero entre 15 y 80 |
 
 ## Conceptos aplicados
 
-- `useState` — estado de cada campo con flag `tocado` para validación progresiva
-- `onChangeText` — validación en tiempo real mientras el usuario escribe
-- `Pressable` — botón de envío con feedback visual (escala + color al presionar)
-- Validaciones — 4 reglas aplicadas antes del envío
-- Feedback UI — mensajes de error inline por campo + pantalla de éxito con resumen
+- `useState` - estado de cada campo con flag `tocado` para validacion progresiva
+- `onChangeText` - validacion en tiempo real mientras el usuario escribe
+- `Pressable` - boton de envio con feedback visual al presionar
+- Validaciones - 4 reglas aplicadas antes del envio
+- Feedback UI - mensajes de error inline por campo + pantalla de exito con resumen
 
 ## Estructura del proyecto
 
 ```
 src/
-├── app/
-│   ├── _layout.tsx          # Configuración del Stack Navigator
-│   └── index.tsx            # Pantalla principal del formulario
-├── components/
-│   └── common/
-│       ├── app-input.tsx    # Input reutilizable con soporte de error visual
-│       └── app-button.tsx   # Botón con Pressable y feedback táctil
-├── constants/
-│   ├── colors.ts            # Paleta de colores
-│   └── theme.ts             # Espaciados, radios y tamaños de fuente
-└── utils/
-    └── validators.ts        # Funciones de validación puras
+??? app/
+?   ??? _layout.tsx          # Configuracion del Stack Navigator
+?   ??? index.tsx            # Pantalla principal del formulario
+??? components/
+?   ??? common/
+?       ??? app-input.tsx    # Input reutilizable con soporte de error visual
+?       ??? app-button.tsx   # Boton con Pressable y feedback tactil
+??? constants/
+?   ??? colors.ts            # Paleta de colores
+?   ??? theme.ts             # Espaciados y tamanos
+??? utils/
+    ??? validators.ts        # Funciones de validacion puras
 ```
 
-## Cómo ejecutar
+## Como ejecutar
 
 ```bash
 npm install
 npx expo start
 ```
 
-Escanea el QR con **Expo Go** (SDK 57) desde tu dispositivo móvil.
-
-## Capturas de pantalla
-
-### Formulario principal
-Pantalla principal con los 4 campos y panel de validaciones en tiempo real.
-
-### Validaciones con errores
-Al presionar "Registrar estudiante" con campos vacíos o inválidos, se muestran mensajes de error inline en rojo bajo cada campo.
-
-### Registro exitoso
-Al completar todos los campos correctamente, se muestra una pantalla de éxito con el resumen de los datos ingresados.
+Escanea el QR con **Expo Go** (SDK 57) desde tu dispositivo movil.
 
 ---
 
 **Autor:** Pierre Conca  
-**Curso:** Desarrollo de Aplicaciones Móviles  
+**Curso:** Desarrollo de Aplicaciones Moviles  
 **Entorno:** React Native CLI / Expo Go  
