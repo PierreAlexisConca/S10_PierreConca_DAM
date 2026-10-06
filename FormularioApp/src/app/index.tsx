@@ -1,750 +1,556 @@
 import { useState } from 'react';
-
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
 
-import { AppInput } from '../components/common/app-input';
 import { AppButton } from '../components/common/app-button';
+import { AppInput } from '../components/common/app-input';
 
 import {
-  validarNombre,
-  validarCorreo,
-  validarEdad,
+    validarCorreo,
+    validarCurso,
+    validarEdad,
+    validarNombre,
 } from '../utils/validators';
 
-export default function Registro() {
+// ─── tipos de estado de cada campo ─────────────────────────────────────────
 
-  const [nombre, setNombre] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [edad, setEdad] = useState('');
+type CampoEstado = {
+  valor: string;
+  tocado: boolean; // true cuando el usuario escribió algo al menos una vez
+};
 
-  const [error, setError] = useState('');
-  const [registrado, setRegistrado] = useState(false);
+const campoInicial: CampoEstado = { valor: '', tocado: false };
 
-  const nombreValido = validarNombre(nombre);
-  const correoValido = validarCorreo(correo);
-  const edadValida = validarEdad(edad);
+// ─── pantalla principal ─────────────────────────────────────────────────────
 
-  const validarFormulario = () => {
+export default function RegistroCurso() {
+  // estados de los 4 campos
+  const [nombre, setNombre] = useState<CampoEstado>(campoInicial);
+  const [correo, setCorreo] = useState<CampoEstado>(campoInicial);
+  const [curso, setCurso]   = useState<CampoEstado>(campoInicial);
+  const [edad, setEdad]     = useState<CampoEstado>(campoInicial);
 
-    setError('');
-    setRegistrado(false);
+  // estado del envío
+  const [enviado, setEnviado] = useState(false);
 
-    if (!nombreValido) {
-      setError('Ingresa tu nombre completo.');
-      return;
+  // ── validaciones ──────────────────────────────────────────────────────────
+  const nombreOk = validarNombre(nombre.valor);
+  const correoOk = validarCorreo(correo.valor);
+  const cursoOk  = validarCurso(curso.valor);
+  const edadOk   = validarEdad(edad.valor);
+  const todoOk   = nombreOk && correoOk && cursoOk && edadOk;
+
+  // muestra error sólo si el campo ya fue tocado
+  const errNombre = nombre.tocado && !nombreOk;
+  const errCorreo = correo.tocado && !correoOk;
+  const errCurso  = curso.tocado  && !cursoOk;
+  const errEdad   = edad.tocado   && !edadOk;
+
+  // ── conteo de validaciones superadas ─────────────────────────────────────
+  const validadasCount = [nombreOk, correoOk, cursoOk, edadOk].filter(Boolean).length;
+
+  // ── handlers ─────────────────────────────────────────────────────────────
+  const handleEnviar = () => {
+    // marcar todos los campos como tocados para mostrar errores
+    setNombre((p) => ({ ...p, tocado: true }));
+    setCorreo((p) => ({ ...p, tocado: true }));
+    setCurso((p)  => ({ ...p, tocado: true }));
+    setEdad((p)   => ({ ...p, tocado: true }));
+
+    if (todoOk) {
+      setEnviado(true);
     }
-
-    if (!correoValido) {
-      setError('Ingresa un correo electrónico válido.');
-      return;
-    }
-
-    if (!edadValida) {
-      setError('La edad debe ser de 18 años o más.');
-      return;
-    }
-
-    setRegistrado(true);
   };
 
+  const handleReset = () => {
+    setNombre(campoInicial);
+    setCorreo(campoInicial);
+    setCurso(campoInicial);
+    setEdad(campoInicial);
+    setEnviado(false);
+  };
+
+  // ── pantalla de éxito ─────────────────────────────────────────────────────
+  if (enviado) {
+    return (
+      <View style={styles.successScreen}>
+        <View style={styles.successIconWrap}>
+          <Text style={styles.successIconChar}>✓</Text>
+        </View>
+
+        <Text style={styles.successHeading}>¡Registro exitoso!</Text>
+        <Text style={styles.successSub}>
+          El estudiante ha sido inscrito correctamente.
+        </Text>
+
+        <View style={styles.successCard}>
+          <SummaryRow label="Nombre"  value={nombre.valor} />
+          <SummaryRow label="Correo"  value={correo.valor} />
+          <SummaryRow label="Curso"   value={curso.valor}  />
+          <SummaryRow label="Edad"    value={`${edad.valor} años`} />
+        </View>
+
+        <AppButton title="Nuevo registro" onPress={handleReset} />
+      </View>
+    );
+  }
+
+  // ── formulario ────────────────────────────────────────────────────────────
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
 
-        {/* ENCABEZADO */}
-
+        {/* ── ENCABEZADO ── */}
         <View style={styles.header}>
-
-          <View style={styles.headerIcon}>
-            <Text style={styles.headerIconText}>
-              +
-            </Text>
+          <View style={styles.headerBadge}>
+            <Text style={styles.headerBadgeText}>📚</Text>
           </View>
-
-          <View>
-            <Text style={styles.overline}>
-              NUEVO REGISTRO
-            </Text>
-
-            <Text style={styles.title}>
-              Crear cuenta
-            </Text>
+          <View style={styles.headerText}>
+            <Text style={styles.overline}>OPCIÓN 5 · DAM S10</Text>
+            <Text style={styles.title}>Registro de Curso</Text>
           </View>
-
         </View>
 
-
         <Text style={styles.description}>
-          Completa tus datos para crear un nuevo registro.
+          Completa los datos del estudiante para inscribirlo al curso.
         </Text>
 
-
-        {/* TARJETA DEL FORMULARIO */}
-
-        <View style={styles.formCard}>
-
-          <Text style={styles.sectionTitle}>
-            Información personal
-          </Text>
-
-          <Text style={styles.sectionDescription}>
-            Todos los campos son obligatorios.
-          </Text>
-
+        {/* ── TARJETA FORMULARIO ── */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Datos del estudiante</Text>
+          <Text style={styles.cardSub}>Todos los campos son obligatorios.</Text>
 
           {/* NOMBRE */}
-
           <AppInput
-            label="Nombre completo"
-            placeholder="Ingresa tu nombre"
-            value={nombre}
-            onChangeText={(value) => {
-              setNombre(value);
-              setError('');
-              setRegistrado(false);
+            label="Nombre del estudiante"
+            placeholder="Ej: Ana García López"
+            value={nombre.valor}
+            onChangeText={(v) => {
+              setNombre({ valor: v, tocado: true });
+              setEnviado(false);
             }}
+            hasError={errNombre}
+            errorMessage="El nombre debe tener al menos 3 caracteres."
           />
 
-          {nombre.length > 0 && (
-            <Text
-              style={[
-                styles.fieldStatus,
-                nombreValido
-                  ? styles.validText
-                  : styles.invalidText,
-              ]}
-            >
-              {nombreValido
-                ? '✓ Nombre válido'
-                : '○ Ingresa tu nombre'}
-            </Text>
-          )}
-
-
           {/* CORREO */}
-
           <AppInput
             label="Correo electrónico"
             placeholder="ejemplo@correo.com"
-            value={correo}
-            onChangeText={(value) => {
-              setCorreo(value);
-              setError('');
-              setRegistrado(false);
+            value={correo.valor}
+            onChangeText={(v) => {
+              setCorreo({ valor: v, tocado: true });
+              setEnviado(false);
             }}
             keyboardType="email-address"
+            hasError={errCorreo}
+            errorMessage="El correo debe contener un @."
           />
 
-          {correo.length > 0 && (
-            <Text
-              style={[
-                styles.fieldStatus,
-                correoValido
-                  ? styles.validText
-                  : styles.invalidText,
-              ]}
-            >
-              {correoValido
-                ? '✓ Correo válido'
-                : '○ Debe contener un @'}
-            </Text>
-          )}
-
+          {/* CURSO */}
+          <AppInput
+            label="Curso"
+            placeholder="Ej: Desarrollo de Apps Móviles"
+            value={curso.valor}
+            onChangeText={(v) => {
+              setCurso({ valor: v, tocado: true });
+              setEnviado(false);
+            }}
+            hasError={errCurso}
+            errorMessage="El curso debe tener al menos 3 caracteres."
+          />
 
           {/* EDAD */}
-
           <AppInput
             label="Edad"
-            placeholder="Ingresa tu edad"
-            value={edad}
-            onChangeText={(value) => {
-              setEdad(value);
-              setError('');
-              setRegistrado(false);
+            placeholder="Ej: 20"
+            value={edad.valor}
+            onChangeText={(v) => {
+              setEdad({ valor: v, tocado: true });
+              setEnviado(false);
             }}
             keyboardType="numeric"
+            hasError={errEdad}
+            errorMessage="La edad debe ser un número entre 15 y 80."
           />
 
-          {edad.length > 0 && (
-            <Text
-              style={[
-                styles.fieldStatus,
-                edadValida
-                  ? styles.validText
-                  : styles.invalidText,
-              ]}
-            >
-              {edadValida
-                ? '✓ Edad permitida'
-                : '○ Debes tener 18 años o más'}
-            </Text>
-          )}
-
-
-          {/* ERROR */}
-
-          {error !== '' && (
-            <View style={styles.errorBox}>
-
-              <View style={styles.errorIcon}>
-                <Text style={styles.errorIconText}>
-                  !
-                </Text>
-              </View>
-
-              <View style={styles.messageContainer}>
-
-                <Text style={styles.errorTitle}>
-                  No se pudo guardar
-                </Text>
-
-                <Text style={styles.errorMessage}>
-                  {error}
-                </Text>
-
-              </View>
-
-            </View>
-          )}
-
-
-          {/* ÉXITO */}
-
-          {registrado && (
-            <View style={styles.successBox}>
-
-              <View style={styles.successIcon}>
-                <Text style={styles.successIconText}>
-                  ✓
-                </Text>
-              </View>
-
-              <View style={styles.messageContainer}>
-
-                <Text style={styles.successTitle}>
-                  ¡Registro exitoso!
-                </Text>
-
-                <Text style={styles.successMessage}>
-                  Todos los datos son válidos.
-                </Text>
-
-              </View>
-
-            </View>
-          )}
-
-
-          {/* BOTÓN */}
-
-          <AppButton
-            title="Guardar datos"
-            onPress={validarFormulario}
-          />
-
+          {/* BOTÓN ENVÍO */}
+          <AppButton title="Registrar estudiante" onPress={handleEnviar} />
         </View>
 
-
-        {/* VALIDACIONES */}
-
-        <View style={styles.validationSection}>
-
-          <View style={styles.validationHeader}>
-
+        {/* ── PANEL DE VALIDACIONES ── */}
+        <View style={styles.card}>
+          <View style={styles.validHeader}>
             <View>
-              <Text style={styles.validationTitle}>
-                Validaciones
-              </Text>
-
-              <Text style={styles.validationSubtitle}>
-                Reglas aplicadas al formulario
+              <Text style={styles.cardTitle}>Validaciones</Text>
+              <Text style={styles.cardSub}>Estado en tiempo real</Text>
+            </View>
+            <View style={[
+              styles.counter,
+              todoOk ? styles.counterDone : styles.counterPending,
+            ]}>
+              <Text style={[
+                styles.counterText,
+                todoOk ? styles.counterTextDone : styles.counterTextPending,
+              ]}>
+                {validadasCount}/4
               </Text>
             </View>
-
-            <View style={styles.counter}>
-
-              <Text style={styles.counterText}>
-                {
-                  [
-                    nombreValido,
-                    correoValido,
-                    edadValida,
-                  ].filter(Boolean).length
-                }/3
-              </Text>
-
-            </View>
-
           </View>
 
-
-          {/* VALIDACIÓN 1 */}
-
           <ValidationRow
-            title="Nombre obligatorio"
-            description="El campo no puede estar vacío."
-            valid={nombreValido}
+            label="Nombre obligatorio"
+            desc="Al menos 3 caracteres."
+            ok={nombreOk}
+            touched={nombre.tocado}
           />
-
-
-          {/* VALIDACIÓN 2 */}
-
           <ValidationRow
-            title="Correo electrónico"
-            description="Debe contener un formato válido."
-            valid={correoValido}
+            label="Correo con @"
+            desc="Formato de correo válido."
+            ok={correoOk}
+            touched={correo.tocado}
           />
-
-
-          {/* VALIDACIÓN 3 */}
-
           <ValidationRow
-            title="Edad mínima"
-            description="La edad debe ser igual o mayor a 18."
-            valid={edadValida}
+            label="Curso obligatorio"
+            desc="Al menos 3 caracteres."
+            ok={cursoOk}
+            touched={curso.tocado}
           />
-
+          <ValidationRow
+            label="Edad válida"
+            desc="Entre 15 y 80 años."
+            ok={edadOk}
+            touched={edad.tocado}
+          />
         </View>
 
-
-        {/* PIE */}
-
         <Text style={styles.footer}>
-          Ejemplo de formulario con validaciones
+          S10 | AP5 — Formularios y Validaciones · React Native + Expo
         </Text>
 
       </ScrollView>
-
     </KeyboardAvoidingView>
   );
 }
 
-
-/* COMPONENTE PARA LAS VALIDACIONES */
+// ─── componentes auxiliares ─────────────────────────────────────────────────
 
 type ValidationRowProps = {
-  title: string;
-  description: string;
-  valid: boolean;
+  label: string;
+  desc: string;
+  ok: boolean;
+  touched: boolean;
 };
 
-function ValidationRow({
-  title,
-  description,
-  valid,
-}: ValidationRowProps) {
+function ValidationRow({ label, desc, ok, touched }: ValidationRowProps) {
+  const showOk    = ok;
+  const showError = touched && !ok;
 
   return (
-    <View style={styles.validationRow}>
-
-      <View
-        style={[
-          styles.validationCircle,
-          valid
-            ? styles.validationCircleValid
-            : styles.validationCirclePending,
-        ]}
-      >
-
-        <Text
-          style={[
-            styles.validationIcon,
-            valid
-              ? styles.validationIconValid
-              : styles.validationIconPending,
-          ]}
-        >
-          {valid ? '✓' : '○'}
+    <View style={vStyles.row}>
+      <View style={[
+        vStyles.dot,
+        showOk    ? vStyles.dotOk    :
+        showError ? vStyles.dotError :
+                    vStyles.dotIdle,
+      ]}>
+        <Text style={[
+          vStyles.dotChar,
+          showOk    ? vStyles.dotCharOk    :
+          showError ? vStyles.dotCharError :
+                      vStyles.dotCharIdle,
+        ]}>
+          {showOk ? '✓' : showError ? '✕' : '○'}
         </Text>
-
       </View>
 
-
-      <View style={styles.validationInfo}>
-
-        <Text style={styles.validationRowTitle}>
-          {title}
-        </Text>
-
-        <Text style={styles.validationRowDescription}>
-          {description}
-        </Text>
-
+      <View style={vStyles.info}>
+        <Text style={vStyles.label}>{label}</Text>
+        <Text style={vStyles.desc}>{desc}</Text>
       </View>
 
-
-      <View
-        style={[
-          styles.statusBadge,
-          valid
-            ? styles.statusBadgeValid
-            : styles.statusBadgePending,
-        ]}
-      >
-
-        <Text
-          style={[
-            styles.statusBadgeText,
-            valid
-              ? styles.statusBadgeTextValid
-              : styles.statusBadgeTextPending,
-          ]}
-        >
-          {valid ? 'OK' : 'Pendiente'}
+      <View style={[
+        vStyles.badge,
+        showOk    ? vStyles.badgeOk    :
+        showError ? vStyles.badgeError :
+                    vStyles.badgeIdle,
+      ]}>
+        <Text style={[
+          vStyles.badgeText,
+          showOk    ? vStyles.badgeTextOk    :
+          showError ? vStyles.badgeTextError :
+                      vStyles.badgeTextIdle,
+        ]}>
+          {showOk ? 'OK' : showError ? 'Error' : 'Pendiente'}
         </Text>
-
       </View>
-
     </View>
   );
 }
 
+type SummaryRowProps = { label: string; value: string };
 
-/* ESTILOS */
+function SummaryRow({ label, value }: SummaryRowProps) {
+  return (
+    <View style={sumStyles.row}>
+      <Text style={sumStyles.label}>{label}</Text>
+      <Text style={sumStyles.value}>{value}</Text>
+    </View>
+  );
+}
+
+// ─── estilos ────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FB',
+    backgroundColor: '#F0F4FF',
   },
 
   scroll: {
     padding: 20,
-    paddingTop: 45,
-    paddingBottom: 35,
+    paddingTop: 48,
+    paddingBottom: 40,
   },
 
-
-  /* HEADER */
-
+  // encabezado
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
   },
-
-  headerIcon: {
-    width: 50,
-    height: 50,
+  headerBadge: {
+    width: 52,
+    height: 52,
     borderRadius: 16,
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
   },
-
-  headerIconText: {
-    color: '#FFFFFF',
-    fontSize: 28,
-    fontWeight: '300',
+  headerBadgeText: {
+    fontSize: 24,
   },
-
+  headerText: {
+    flex: 1,
+  },
   overline: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#6366F1',
-    letterSpacing: 1.5,
+    color: '#2563EB',
+    letterSpacing: 1.4,
     marginBottom: 3,
   },
-
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#172033',
+    color: '#111827',
   },
-
   description: {
     fontSize: 14,
+    color: '#6B7280',
     lineHeight: 21,
-    color: '#667085',
-    marginBottom: 24,
-  },
-
-
-  /* FORMULARIO */
-
-  formCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 22,
-    padding: 22,
-    borderWidth: 1,
-    borderColor: '#E8EBF0',
-    marginBottom: 20,
-  },
-
-  sectionTitle: {
-    fontSize: 19,
-    fontWeight: '800',
-    color: '#172033',
-    marginBottom: 4,
-  },
-
-  sectionDescription: {
-    fontSize: 13,
-    color: '#98A2B3',
     marginBottom: 22,
   },
 
-
-  /* ESTADO DE CAMPOS */
-
-  fieldStatus: {
-    fontSize: 11,
-    fontWeight: '600',
-    marginTop: -10,
-    marginBottom: 14,
-  },
-
-  validText: {
-    color: '#16A34A',
-  },
-
-  invalidText: {
-    color: '#D97706',
-  },
-
-
-  /* ERROR */
-
-  errorBox: {
-    flexDirection: 'row',
-    backgroundColor: '#FFF5F5',
-    borderRadius: 14,
-    padding: 13,
-    marginBottom: 17,
-    borderWidth: 1,
-    borderColor: '#FECACA',
-  },
-
-  errorIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FEE2E2',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 11,
-  },
-
-  errorIconText: {
-    color: '#DC2626',
-    fontSize: 17,
-    fontWeight: '800',
-  },
-
-  messageContainer: {
-    flex: 1,
-  },
-
-  errorTitle: {
-    color: '#991B1B',
-    fontSize: 13,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-
-  errorMessage: {
-    color: '#B42318',
-    fontSize: 12,
-    lineHeight: 17,
-  },
-
-
-  /* ÉXITO */
-
-  successBox: {
-    flexDirection: 'row',
-    backgroundColor: '#F0FDF4',
-    borderRadius: 14,
-    padding: 13,
-    marginBottom: 17,
-    borderWidth: 1,
-    borderColor: '#BBF7D0',
-  },
-
-  successIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#DCFCE7',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 11,
-  },
-
-  successIconText: {
-    color: '#16A34A',
-    fontSize: 17,
-    fontWeight: '800',
-  },
-
-  successTitle: {
-    color: '#166534',
-    fontSize: 13,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-
-  successMessage: {
-    color: '#15803D',
-    fontSize: 12,
-  },
-
-
-  /* VALIDACIONES */
-
-  validationSection: {
+  // tarjeta genérica
+  card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 22,
+    borderRadius: 20,
     padding: 22,
     borderWidth: 1,
-    borderColor: '#E8EBF0',
+    borderColor: '#E5E7EB',
+    marginBottom: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
-
-  validationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  cardSub: {
+    fontSize: 13,
+    color: '#9CA3AF',
     marginBottom: 20,
   },
 
-  validationTitle: {
-    fontSize: 19,
-    fontWeight: '800',
-    color: '#172033',
-    marginBottom: 3,
+  // panel validaciones — header
+  validHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
   },
-
-  validationSubtitle: {
-    fontSize: 12,
-    color: '#98A2B3',
-  },
-
   counter: {
-    width: 45,
-    height: 45,
+    width: 48,
+    height: 48,
     borderRadius: 14,
-    backgroundColor: '#EEF2FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-
+  counterDone: {
+    backgroundColor: '#DCFCE7',
+  },
+  counterPending: {
+    backgroundColor: '#EEF2FF',
+  },
   counterText: {
-    color: '#4F46E5',
     fontSize: 14,
     fontWeight: '800',
   },
-
-
-  /* FILAS */
-
-  validationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 13,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F2F5',
-  },
-
-  validationCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-
-  validationCircleValid: {
-    backgroundColor: '#DCFCE7',
-  },
-
-  validationCirclePending: {
-    backgroundColor: '#F3F4F6',
-  },
-
-  validationIcon: {
-    fontSize: 17,
-    fontWeight: '800',
-  },
-
-  validationIconValid: {
+  counterTextDone: {
     color: '#16A34A',
   },
-
-  validationIconPending: {
-    color: '#98A2B3',
+  counterTextPending: {
+    color: '#2563EB',
   },
 
-  validationInfo: {
+  // pantalla de éxito
+  successScreen: {
     flex: 1,
+    backgroundColor: '#F0F4FF',
+    padding: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-
-  validationRowTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#344054',
-    marginBottom: 3,
+  successIconWrap: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#DCFCE7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
   },
-
-  validationRowDescription: {
-    fontSize: 11,
-    color: '#98A2B3',
-    lineHeight: 16,
-  },
-
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 8,
-    marginLeft: 8,
-  },
-
-  statusBadgeValid: {
-    backgroundColor: '#ECFDF3',
-  },
-
-  statusBadgePending: {
-    backgroundColor: '#F2F4F7',
-  },
-
-  statusBadgeText: {
-    fontSize: 9,
+  successIconChar: {
+    fontSize: 36,
+    color: '#16A34A',
     fontWeight: '800',
   },
-
-  statusBadgeTextValid: {
-    color: '#027A48',
+  successHeading: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: 8,
   },
-
-  statusBadgeTextPending: {
-    color: '#667085',
+  successSub: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 28,
+    textAlign: 'center',
   },
-
-
-  /* FOOTER */
+  successCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    width: '100%',
+    marginBottom: 28,
+  },
 
   footer: {
     textAlign: 'center',
     fontSize: 11,
-    color: '#98A2B3',
-    marginTop: 22,
+    color: '#9CA3AF',
+    marginTop: 4,
   },
+});
 
+const vStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+  },
+  dot: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  dotOk:    { backgroundColor: '#DCFCE7' },
+  dotError: { backgroundColor: '#FEE2E2' },
+  dotIdle:  { backgroundColor: '#F3F4F6' },
+  dotChar: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  dotCharOk:    { color: '#16A34A' },
+  dotCharError: { color: '#DC2626' },
+  dotCharIdle:  { color: '#9CA3AF' },
+  info: {
+    flex: 1,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#374151',
+    marginBottom: 2,
+  },
+  desc: {
+    fontSize: 11,
+    color: '#9CA3AF',
+  },
+  badge: {
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 8,
+    marginLeft: 8,
+  },
+  badgeOk:    { backgroundColor: '#ECFDF5' },
+  badgeError: { backgroundColor: '#FEF2F2' },
+  badgeIdle:  { backgroundColor: '#F3F4F6' },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  badgeTextOk:    { color: '#065F46' },
+  badgeTextError: { color: '#991B1B' },
+  badgeTextIdle:  { color: '#6B7280' },
+});
+
+const sumStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  label: {
+    fontSize: 13,
+    color: '#6B7280',
+    fontWeight: '600',
+  },
+  value: {
+    fontSize: 13,
+    color: '#111827',
+    fontWeight: '700',
+    flexShrink: 1,
+    textAlign: 'right',
+    marginLeft: 12,
+  },
 });

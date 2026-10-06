@@ -1,56 +1,74 @@
-# Welcome to your Expo app 👋
+# S10_PierreConca_DAM
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Desarrollo de Aplicaciones Móviles — S10 | AP5**  
+Actividad Individual: Formularios y Validaciones  
+React Native + Expo
 
-## Get started
+---
 
-1. Install dependencies
+## Descripción
 
-   ```bash
-   npm install
-   ```
+Formulario móvil interactivo de **Registro de Curso** (Opción 5) implementado con React Native y Expo Router. Aplica manejo de estados con `useState`, captura de datos con `TextInput`, validaciones en tiempo real y feedback visual al usuario.
 
-2. Start the app
+## Opción implementada
 
-   ```bash
-   npx expo start
-   ```
+**Opción 5 — Registro de Curso**
 
-In the output, you'll find options to open the app in a
+| Campo | Validación |
+|---|---|
+| Nombre del estudiante | Obligatorio, mínimo 3 caracteres |
+| Correo electrónico | Obligatorio, debe contener `@` |
+| Curso | Obligatorio, mínimo 3 caracteres |
+| Edad | Número entero entre 15 y 80 |
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Conceptos aplicados
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- `useState` — estado de cada campo con flag `tocado` para validación progresiva
+- `onChangeText` — validación en tiempo real mientras el usuario escribe
+- `Pressable` — botón de envío con feedback visual (escala + color al presionar)
+- Validaciones — 4 reglas aplicadas antes del envío
+- Feedback UI — mensajes de error inline por campo + pantalla de éxito con resumen
 
-## Get a fresh project
+## Estructura del proyecto
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+src/
+├── app/
+│   ├── _layout.tsx          # Configuración del Stack Navigator
+│   └── index.tsx            # Pantalla principal del formulario
+├── components/
+│   └── common/
+│       ├── app-input.tsx    # Input reutilizable con soporte de error visual
+│       └── app-button.tsx   # Botón con Pressable y feedback táctil
+├── constants/
+│   ├── colors.ts            # Paleta de colores
+│   └── theme.ts             # Espaciados, radios y tamaños de fuente
+└── utils/
+    └── validators.ts        # Funciones de validación puras
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Cómo ejecutar
 
-### Other setup steps
+```bash
+npm install
+npx expo start
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Escanea el QR con **Expo Go** (SDK 57) desde tu dispositivo móvil.
 
-## Learn more
+## Capturas de pantalla
 
-To learn more about developing your project with Expo, look at the following resources:
+### Formulario principal
+Pantalla principal con los 4 campos y panel de validaciones en tiempo real.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Validaciones con errores
+Al presionar "Registrar estudiante" con campos vacíos o inválidos, se muestran mensajes de error inline en rojo bajo cada campo.
 
-## Join the community
+### Registro exitoso
+Al completar todos los campos correctamente, se muestra una pantalla de éxito con el resumen de los datos ingresados.
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Autor:** Pierre Conca  
+**Curso:** Desarrollo de Aplicaciones Móviles  
+**Entorno:** React Native CLI / Expo Go  
